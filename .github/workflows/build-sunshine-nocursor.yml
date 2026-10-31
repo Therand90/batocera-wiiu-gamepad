@@ -1,0 +1,92 @@
+name: Build Sunshine WiiU NoCursor
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone pinned Sunshine source
+        run: |
+          git clone --recurse-submodules --branch v2026.914.233613 --depth 1 \
+            https://github.com/LizardByte/Sunshine.git Sunshine
+          cd Sunshine
+          git apply ../build/sunshine/no-cursor.patch
+          grep -n 'bool display_cursor = false;' src/globals.cpp
+
+      - name: Install base AppImage dependencies
+        run: |
+          sudo add-apt-repository universe -y
+          sudo apt-get update
+          sudo apt-get install -y \
+            libdrm-dev libfuse2 libgl-dev libwayland-dev libx11-xcb-dev \
+            libxcb-dri3-dev libxfixes-dev libxtst-dev
+
+      - name: Build latest libva
+        working-directory: Sunshine
+        run: |
+          gh release download --archive=tar.gz --repo=intel/libva
+          tar xzf libva-*.tar.gz
+          rm libva-*.tar.gz
+          cd libva-*
+          ./autogen.sh --prefix=/usr --libdir="/usr/lib/x86_64-linux-gnu" \
+            --enable-drm --enable-x11 --enable-glx --enable-wayland --without-legacy
+          make -j "$(nproc)"
+          sudo make install
+
+      - name: Build Sunshine
+        working-directory: Sunshine
+        env:
+          BUILD_VERSION: 2026.914.233613-wiiu-nocursor
+          BRANCH: batocera-wiiu-gamepad
+          COMMIT: sunshine-v2026.914.233613-nocursor
+        run: |
+          chmod +x ./scripts/linux_build.sh
+          ./scripts/linux_build.sh \
+            --publisher-name="Therand90 WiiU GamePad" \
+            --publisher-website="https://github.com/Therand90/batocera-wiiu-gamepad" \
+            --publisher-issue-url="https://github.com/Therand90/batocera-wiiu-gamepad/issues" \
+            --skip-cleanup --skip-package --ubuntu-test-repo --appimage-build
+
+      - name: Package AppImage
+        working-directory: Sunshine/build
+        env:
+          APP_ID: dev.lizardbyte.app.Sunshine
+        run: |
+          DESTDIR=AppDir ninja install
+          cp -f ../packaging/linux/AppImage/AppRun ./AppDir/
+          chmod +x ./AppDir/AppRun
+
+          DESKTOP_FILE="${DESKTOP_FILE:-${APP_ID}.desktop}"
+          ICON_FILE="${ICON_FILE:-sunshine.png}"
+          LINUXDEPLOY_GH="https://github.com/linuxdeploy/linuxdeploy"
+
+          wget --max-redirect=1 -q "${LINUXDEPLOY_GH}/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          chmod +x linuxdeploy-x86_64.AppImage
+          wget --max-redirect=1 -q "${LINUXDEPLOY_GH}-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
+
+          export QMAKE=/usr/lib/qt6/bin/qmake
+          export EXTRA_QT_MODULES="svg;"
+
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir ./AppDir --plugin qt --executable ./sunshine \
+            --icon-file "../${ICON_FILE}" --desktop-file "./${DESKTOP_FILE}" --output appimage
+
+          mkdir -p ../artifacts
+          mv Sunshine*.AppImage ../artifacts/Sunshine-NoCursor.AppImage
+          sha256sum ../artifacts/Sunshine-NoCursor.AppImage | tee ../artifacts/SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sunshine-WiiU-NoCursor
+          path: Sunshine/artifacts/
+          if-no-files-found: error
