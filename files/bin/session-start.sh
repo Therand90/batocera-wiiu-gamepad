@@ -5,6 +5,7 @@ BIN="$BASE/bin"
 RUN='/tmp/wiiu-gamepad'
 LOG="$BASE/logs/session-start.log"
 
+# shellcheck source=/dev/null
 . "$BIN/common.sh"
 mkdir -p "$RUN" "$BASE/logs"
 exec >>"$LOG" 2>&1
