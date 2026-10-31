@@ -2,6 +2,7 @@
 set -e
 
 BASE='/userdata/system/wiiu-gamepad'
+# shellcheck source=/dev/null
 . "$BASE/bin/common.sh"
 
 TV_SINK="$(detect_tv_sink)"
