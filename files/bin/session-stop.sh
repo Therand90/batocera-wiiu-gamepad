@@ -3,6 +3,7 @@
 BASE='/userdata/system/wiiu-gamepad'
 RUN='/tmp/wiiu-gamepad'
 LOG="$BASE/logs/session-stop.log"
+# shellcheck source=/dev/null
 . "$BASE/bin/common.sh"
 load_config
 
