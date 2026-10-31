@@ -2,6 +2,7 @@
 export LC_ALL=C
 
 BASE='/userdata/system/wiiu-gamepad'
+# shellcheck source=/dev/null
 . "$BASE/bin/common.sh"
 load_config
 
