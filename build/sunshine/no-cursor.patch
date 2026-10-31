@@ -1,0 +1,6 @@
+diff --git a/src/globals.cpp b/src/globals.cpp
+--- a/src/globals.cpp
++++ b/src/globals.cpp
+@@
+-bool display_cursor = true;
++bool display_cursor = false;
