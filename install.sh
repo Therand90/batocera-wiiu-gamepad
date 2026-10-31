@@ -77,5 +77,5 @@ PY
 
 echo
 echo 'Installation terminée.'
-echo 'Le pairing, les certificats et les credentials Sunshine existants n’ont pas été modifiés.'
+echo "Le pairing, les certificats et les credentials Sunshine existants n'ont pas été modifiés."
 echo 'Lancez ensuite un jeu Wii U depuis EmulationStation.'
