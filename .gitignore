@@ -1,0 +1,19 @@
+# Runtime/private data
+credentials/
+sunshine_state.json
+apps.json
+*.pem
+logs/
+backups/
+
+# Third-party/release binaries are attached to GitHub releases, not committed
+*.AppImage
+*.apk
+
+# Wii U system files must never be distributed
+*.rpl
+
+# Local artifacts
+*.zip
+*.tar.gz
+.DS_Store
