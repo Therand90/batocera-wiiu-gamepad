@@ -1,8 +1,8 @@
 #!/bin/bash
 
 BASE='/userdata/system/wiiu-gamepad'
-RUN='/tmp/wiiu-gamepad'
 CONFIG="$BASE/config.env"
+# shellcheck disable=SC2034
 PAD_OUTPUT='WIIU-GAMEPAD'
 PAD_SINK='WIIU_GAMEPAD_AUDIO'
 
@@ -10,6 +10,7 @@ export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/var/run}"
 
 load_config() {
+    # shellcheck source=/dev/null
     [ -f "$CONFIG" ] && . "$CONFIG"
     TV_SINK="${TV_SINK:-}"
     PRIMARY_OUTPUT="${PRIMARY_OUTPUT:-}"
