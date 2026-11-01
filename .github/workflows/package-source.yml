@@ -1,0 +1,47 @@
+name: Package WiiU GamePad source
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+    paths:
+      - .github/workflows/package-source.yml
+      - files/**
+      - docs/**
+      - install.sh
+      - uninstall.sh
+      - README.md
+      - RELEASE_NOTES.md
+      - VERSION
+      - LICENSE
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage release source tree
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          STAGE="out/batocera-wiiu-gamepad-v$VERSION"
+          mkdir -p "$STAGE"
+          cp -a install.sh uninstall.sh README.md RELEASE_NOTES.md VERSION LICENSE "$STAGE/"
+          cp -a files docs "$STAGE/"
+          rm -f "$STAGE/files/sunshine/"*.AppImage
+
+          if find "$STAGE" -type f \(               -name '*.rpl' -o               -name '*.pem' -o               -name '*.jks' -o               -name '*.keystore' -o               -name '*.p12' -o               -name '*.pfx' -o               -name 'sunshine_state.json' -o               -name 'apps.json'             \) | grep -q .; then
+            echo "Forbidden private/proprietary release content found"
+            exit 1
+          fi
+
+          find "$STAGE" -type f -print0 | sort -z | xargs -0 sha256sum > "$STAGE/SOURCE_SHA256SUMS.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: batocera-wiiu-gamepad-source
+          path: out/
+          if-no-files-found: error
