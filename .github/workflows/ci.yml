@@ -12,9 +12,9 @@ jobs:
 
       - name: Reject private/proprietary files
         run: |
-          if find . -type f \( -name '*.rpl' -o -name '*.pem' -o -name 'sunshine_state.json' -o -name 'apps.json' \) | grep -q .; then
+          if find . -type f \( -name '*.rpl' -o -name '*.pem' -o -name '*.jks' -o -name '*.keystore' -o -name '*.p12' -o -name '*.pfx' -o -name 'sunshine_state.json' -o -name 'apps.json' \) | grep -q .; then
             echo 'Forbidden private/proprietary file found'
-            find . -type f \( -name '*.rpl' -o -name '*.pem' -o -name 'sunshine_state.json' -o -name 'apps.json' \)
+            find . -type f \( -name '*.rpl' -o -name '*.pem' -o -name '*.jks' -o -name '*.keystore' -o -name '*.p12' -o -name '*.pfx' -o -name 'sunshine_state.json' -o -name 'apps.json' \)
             exit 1
           fi
 
@@ -25,3 +25,8 @@ jobs:
         run: |
           find . -type f -name '*.sh' -print0 | xargs -0 -r bash -n
           find . -type f -name '*.sh' -print0 | xargs -0 -r shellcheck
+
+      - name: Validate Python and display-layout tests
+        run: |
+          python3 -m compileall -q files/bin build tests
+          python3 -m unittest discover -s tests -p 'test_*.py'

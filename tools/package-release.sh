@@ -10,7 +10,7 @@ SUN="${1:-$ROOT/vendor/Sunshine-NoCursor.AppImage}"
 APK="${2:-$ROOT/vendor/Moonlight-WiiU-GamePad.apk}"
 
 SUN_SHA='4d0d08677277526274bb023cd5a93562cb340e74935261bdb54d63a539662b94'
-APK_SHA='523ef85a6cbfb5eaf2d91283d0556bf7e42e24ac3e08f79b9b16873df678b1cf'
+APK_SHA='cd7bb0ea1adc6f1e73ee3923c71d2cdc34a86b49feca4bb4c55819776dbaf447'
 
 [ -f "$SUN" ] || {
     echo "ERREUR : Sunshine NoCursor introuvable : $SUN" >&2
@@ -28,7 +28,7 @@ actual_sun="$(sha256sum "$SUN" | awk '{print $1}')"
 rm -rf "$STAGE"
 mkdir -p "$STAGE/files/sunshine" "$STAGE/android" "$DIST"
 
-cp -a "$ROOT/install.sh" "$ROOT/uninstall.sh" "$ROOT/VERSION" "$ROOT/LICENSE" "$ROOT/README.md" "$STAGE/"
+cp -a "$ROOT/install.sh" "$ROOT/uninstall.sh" "$ROOT/VERSION" "$ROOT/LICENSE" "$ROOT/README.md" "$ROOT/RELEASE_NOTES.md" "$STAGE/"
 cp -a "$ROOT/files" "$ROOT/docs" "$STAGE/"
 cp -a "$SUN" "$STAGE/files/sunshine/Sunshine-NoCursor.AppImage"
 chmod +x "$STAGE/files/sunshine/Sunshine-NoCursor.AppImage"

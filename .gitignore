@@ -17,3 +17,10 @@ backups/
 *.zip
 *.tar.gz
 .DS_Store
+# Never commit production Android signing keys
+*.jks
+*.keystore
+*.p12
+*.pfx
+release-signing/
+

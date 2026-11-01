@@ -38,13 +38,28 @@ detect_primary_output() {
         return 0
     fi
 
-    wlr-randr 2>/dev/null | awk '/^[^[:space:]].* enabled/ {print $1; exit}'
+    wlr-randr 2>/dev/null | awk '
+/^[^[:space:]]/ { output=$1; next }
+/^[[:space:]]+Enabled: yes/ && output != "" { print output; exit }
+'
 }
 
 detect_gamepad_position() {
     local output="$1"
-    local width='' xpos='0' ypos='0' mode
+    local layout="$BASE/bin/display_layout.py"
+    local pos=''
 
+    if [ -x "$layout" ]; then
+        pos="$(wlr-randr 2>/dev/null | "$layout" --primary "$output" 2>/dev/null || true)"
+        if [ -n "$pos" ]; then
+            printf '%s\n' "$pos"
+            return 0
+        fi
+    fi
+
+    # Conservative fallback for unexpected wlr-randr formats: place the GamePad
+    # directly after Batocera's primary display, matching v0.1.0 behavior.
+    local width='' xpos='0' ypos='0' mode
     mode="$(batocera-resolution currentMode 2>/dev/null | grep -Eo '[0-9]+x[0-9]+' | head -1 || true)"
     [ -n "$mode" ] && width="${mode%%x*}"
 
@@ -64,7 +79,6 @@ EOF_POS
     xpos="${xpos:-0}"
     ypos="${ypos:-0}"
     width="${width:-1920}"
-
     printf '%s %s\n' "$((xpos + width))" "$ypos"
 }
 

@@ -69,6 +69,7 @@ PY
 "$BIN/ensure-labwc.sh"
 
 for f in "$BIN/"*.sh "$HOOK"; do bash -n "$f"; done
+python3 -m py_compile "$BIN/"*.py
 python3 - <<'PY'
 import xml.etree.ElementTree as ET
 ET.parse('/userdata/system/.config/labwc/rc.xml')

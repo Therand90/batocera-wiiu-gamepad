@@ -2,6 +2,12 @@ name: Build Moonlight WiiU GamePad
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feature/auto-display-profile
+    paths:
+      - build/moonlight/patch.py
+      - .github/workflows/build-moonlight-wiiu.yml
 
 jobs:
   build:
@@ -71,6 +77,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Moonlight-WiiU-GamePad
+          name: Moonlight-WiiU-GamePad-debug
           path: out/
           if-no-files-found: error

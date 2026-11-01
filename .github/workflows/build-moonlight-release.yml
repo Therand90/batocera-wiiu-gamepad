@@ -1,0 +1,105 @@
+name: Build Moonlight WiiU production APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate signing secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.MOONLIGHT_RELEASE_KEYSTORE_B64 }}
+          STORE_PASSWORD: ${{ secrets.MOONLIGHT_RELEASE_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.MOONLIGHT_RELEASE_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_B64" || { echo "Missing MOONLIGHT_RELEASE_KEYSTORE_B64"; exit 1; }
+          test -n "$STORE_PASSWORD" || { echo "Missing MOONLIGHT_RELEASE_STORE_PASSWORD"; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo "Missing MOONLIGHT_RELEASE_KEY_PASSWORD"; exit 1; }
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Clone pinned Moonlight Android source
+        run: |
+          git clone --recursive https://github.com/moonlight-stream/moonlight-android.git moonlight
+          cd moonlight
+          git checkout b48494cb96bff23d8886c4775cc4f39a1075495d
+          git submodule update --init --recursive
+          git rev-parse HEAD | tee ../MOONLIGHT_UPSTREAM_COMMIT.txt
+
+      - name: Install required Android SDK components
+        run: |
+          SDKROOT="/usr/local/lib/android/sdk"
+          SDKMANAGER="$SDKROOT/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" --channel=3             "platforms;android-37.0"             "build-tools;37.0.0"             "ndk;29.0.14206865"
+
+          if [ -d "$SDKROOT/platforms/android-37.0" ] && [ ! -e "$SDKROOT/platforms/android-37" ]; then
+            ln -s "$SDKROOT/platforms/android-37.0" "$SDKROOT/platforms/android-37"
+          fi
+
+      - name: Prepare private production keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.MOONLIGHT_RELEASE_KEYSTORE_B64 }}
+        run: |
+          KEYSTORE="$RUNNER_TEMP/moonlight-wiiu-release.jks"
+          printf '%s' "$KEYSTORE_B64" | base64 -d > "$KEYSTORE"
+          chmod 600 "$KEYSTORE"
+          test -s "$KEYSTORE"
+          echo "WIIU_RELEASE_KEYSTORE=$KEYSTORE" >> "$GITHUB_ENV"
+
+      - name: Patch Moonlight for Wii U GamePad
+        run: python3 build/moonlight/patch.py moonlight
+
+      - name: Build signed production APK
+        working-directory: moonlight
+        env:
+          WIIU_RELEASE_KEYSTORE: ${{ env.WIIU_RELEASE_KEYSTORE }}
+          WIIU_RELEASE_STORE_PASSWORD: ${{ secrets.MOONLIGHT_RELEASE_STORE_PASSWORD }}
+          WIIU_RELEASE_KEY_ALIAS: moonlight-wiiu
+          WIIU_RELEASE_KEY_PASSWORD: ${{ secrets.MOONLIGHT_RELEASE_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleNonRootRelease --stacktrace
+
+      - name: Verify production certificate and prepare artifact
+        run: |
+          mkdir -p out
+          APK="$(find moonlight/app/build/outputs/apk -type f -name '*nonRoot*release*.apk' | head -n1)"
+          test -n "$APK"
+          APKSIGNER="/usr/local/lib/android/sdk/build-tools/37.0.0/apksigner"
+          test -x "$APKSIGNER"
+
+          EXPECTED_CERT="AC16EE09A15BFCB22D3E178F5406B17C22E1AB93C3BAC068FE6DF653BAA3150C"
+
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee out/CERTIFICATE.txt
+
+          ACTUAL_CERT="$(sed -n 's/.*certificate SHA-256 digest: //p' out/CERTIFICATE.txt | \
+            head -n1 | tr '[:lower:]' '[:upper:]' | tr -d ':[:space:]')"
+
+          echo "Expected cert: $EXPECTED_CERT"
+          echo "Actual cert:   $ACTUAL_CERT"
+          test -n "$ACTUAL_CERT"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+
+          cp "$APK" out/Moonlight-WiiU-GamePad.apk
+          cp MOONLIGHT_UPSTREAM_COMMIT.txt out/
+          sha256sum out/Moonlight-WiiU-GamePad.apk | tee out/SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Moonlight-WiiU-GamePad-production
+          path: out/
+          if-no-files-found: error

@@ -21,11 +21,11 @@ Reference hardware:
 
 ## Wii U GamePad runtime
 
-Validated end-to-end:
+Validated end-to-end on the reference single-display system:
 
 - automatic detection of the TV audio sink
-- automatic detection of the primary display
-- automatic GamePad placement directly to the right of the primary display
+- automatic detection of the physical display layout
+- automatic GamePad placement at the correct logical position
 - virtual `WIIU-GAMEPAD` output at 854x480
 - Cemu GamePad View moved/fullscreened on the virtual output
 - Android GamePad video through Sunshine/Moonlight
@@ -35,6 +35,19 @@ Validated end-to-end:
 - Sunshine NoCursor capture
 - clean shutdown and return to EmulationStation
 - automatic cleanup of virtual output and audio sink
+- Sunshine Web UI pairing from Android
+- manual Moonlight host entry by IPv4 when automatic discovery is unavailable
+- Moonlight fullscreen mode
+- fixed anti-gesture bezel restored to 16 dp left/right and 24 dp top/bottom
+
+The multi-monitor layout algorithm is additionally covered by automated tests for:
+
+- monitor already positioned to the right
+- monitor positioned to the left
+- scaled output
+- rotated output
+- existing `WIIU-GAMEPAD` output
+- primary display with a non-zero/negative Y position
 
 Reference auto-detected values on the validation machine:
 
@@ -45,6 +58,19 @@ GamePad position: 1920,0
 ```
 
 These values are **not hard-coded** in the portable runtime; they are recorded only as the reference test result.
+
+## Android / Moonlight WiiU
+
+The RC client was validated on the reference Android device. The final production-signed APK is built from the same client patch; its build, package identity, and production certificate were verified, and it was accepted for release without a separate final-device regression pass.
+
+Validated/verified behavior includes:
+
+- 854x480 / 60 FPS automatic Wii U profile
+- direct touch input
+- fullscreen enabled
+- fixed safe bezel: 16 dp left/right, 24 dp top/bottom
+- bitrate left automatic by default, with manual adjustment available if required
+- successful pairing through Sunshine's Web UI
 
 ## Known limitation
 

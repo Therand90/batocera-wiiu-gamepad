@@ -7,13 +7,18 @@
 ### gameStart
 
 1. Re-inject the required LabWC rules if Batocera regenerated `rc.xml` at boot.
-2. Detect the current TV audio sink and primary output geometry.
-3. Patch only the required Cemu audio fields.
-4. Create `WIIU-GAMEPAD` through LabWC's virtual-output action.
-5. Configure the virtual output as 854x480 and place it directly to the right of the primary display.
-6. Create the `WIIU_GAMEPAD_AUDIO` null sink.
-7. Start a detached session runner so the Batocera launcher is not blocked.
-8. Wait for Cemu, start the audio guard, then launch Sunshine NoCursor.
+2. Detect the current TV audio sink and physical display layout.
+3. Refresh Sunshine's allowed local Web UI origins from the machine's active IPv4 addresses.
+4. Patch only the required Cemu audio fields.
+5. Create `WIIU-GAMEPAD` through LabWC's virtual-output action.
+6. Configure the virtual output as 854x480 and place it after the right-most logical edge of all active physical displays.
+7. Create the `WIIU_GAMEPAD_AUDIO` null sink.
+8. Start a detached session runner so the Batocera launcher is not blocked.
+9. Wait for Cemu, start the audio guard, then launch Sunshine NoCursor.
+
+The display-placement calculation accounts for existing monitors, output position, scaling, and
+90°/270° rotation. If the layout parser cannot understand an unexpected `wlr-randr` format, the
+runtime falls back to placing the GamePad directly after Batocera's primary display.
 
 The detached runner uses Python `subprocess.Popen(..., start_new_session=True, close_fds=True)`. This behavior is intentional: using `setsid` directly kept Batocera's launcher attached during development and caused a long black-screen delay before Cemu appeared.
 
@@ -24,6 +29,16 @@ The detached runner uses Python `subprocess.Popen(..., start_new_session=True, c
 3. Remove only `WIIU_GAMEPAD_AUDIO`.
 4. Remove `WIIU-GAMEPAD`.
 5. Clean `/tmp/wiiu-gamepad`.
+
+## Sunshine lifecycle
+
+Sunshine NoCursor is **not** a permanent system service.
+
+It starts only after Cemu is detected during a Wii U session and stops when the Wii U game exits.
+This keeps the host inactive when the GamePad stream is not needed.
+
+As a consequence, first-time Moonlight pairing must be performed while a Wii U game is running.
+See `docs/pairing.md`.
 
 ## LabWC
 
@@ -41,3 +56,9 @@ Cemu is configured with two outputs:
 - GamePad output -> `WIIU_GAMEPAD_AUDIO`.
 
 The audio guard identifies Cemu sink inputs and continuously keeps them on their intended sinks while Cemu is running.
+
+## Sunshine Web UI security
+
+The runtime keeps Sunshine's Web UI LAN-scoped and automatically writes the machine's active
+IPv4 origins to `csrf_allowed_origins`. This allows pairing from a browser on the local network
+without hard-coding a machine-specific IP into the release package.

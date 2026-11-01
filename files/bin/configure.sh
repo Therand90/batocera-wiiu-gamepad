@@ -18,6 +18,40 @@ fi
 
 write_config "$TV_SINK" "$PRIMARY_OUTPUT" "$GAMEPAD_X" "$GAMEPAD_Y"
 
+SUN_CONF="$BASE/sunshine/sunshine.conf"
+CSRF_ORIGINS="$(ip -4 -o addr show scope global 2>/dev/null | awk '
+{
+    split($4, a, "/")
+    if (a[1] != "") {
+        if (out != "") out = out ","
+        out = out "https://" a[1] ":47990"
+    }
+}
+END { print out }
+')"
+
+if [ -n "$CSRF_ORIGINS" ] && [ -f "$SUN_CONF" ]; then
+    CSRF_ORIGINS="$CSRF_ORIGINS" python3 <<'PY'
+from pathlib import Path
+import os
+import re
+
+p = Path('/userdata/system/wiiu-gamepad/sunshine/sunshine.conf')
+s = p.read_text()
+value = os.environ['CSRF_ORIGINS']
+line = f'csrf_allowed_origins = {value}'
+
+if re.search(r'^csrf_allowed_origins\s*=.*$', s, flags=re.M):
+    s = re.sub(r'^csrf_allowed_origins\s*=.*$', line, s, count=1, flags=re.M)
+else:
+    if s and not s.endswith('\n'):
+        s += '\n'
+    s += line + '\n'
+
+p.write_text(s)
+PY
+fi
+
 CEMU='/userdata/system/configs/cemu/settings.xml'
 if [ -f "$CEMU" ]; then
     TV_SINK="$TV_SINK" python3 <<'PY'
@@ -48,5 +82,5 @@ else
     echo "ATTENTION : $CEMU absent ; les réglages audio Cemu seront appliqués au prochain gameStart si le fichier existe alors." >&2
 fi
 
-printf 'TV sink: %s\nPrimary output: %s\nGamePad position: %s,%s\n' \
-    "$TV_SINK" "${PRIMARY_OUTPUT:-unknown}" "$GAMEPAD_X" "$GAMEPAD_Y"
+printf 'TV sink: %s\nPrimary output: %s\nGamePad position: %s,%s\nSunshine CSRF origins: %s\n' \
+    "$TV_SINK" "${PRIMARY_OUTPUT:-unknown}" "$GAMEPAD_X" "$GAMEPAD_Y" "${CSRF_ORIGINS:-built-in defaults}"
