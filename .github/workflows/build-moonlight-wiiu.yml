@@ -1,13 +1,7 @@
-name: Build Moonlight WiiU GamePad
+name: Build Moonlight WiiU debug APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/auto-display-profile
-    paths:
-      - build/moonlight/patch.py
-      - .github/workflows/build-moonlight-wiiu.yml
 
 jobs:
   build:
