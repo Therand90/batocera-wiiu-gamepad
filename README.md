@@ -61,6 +61,17 @@ The physical controls can remain on a local controller connected to Batocera. Th
 
 After the Batocera installation is complete **and the bundled Moonlight WiiU APK has been installed or copied to the Android device**, the extracted release directory can safely be deleted. The installed runtime lives under `/userdata/system/wiiu-gamepad` with its Batocera hook under `/userdata/system/scripts/wiiu-gamepad.sh`.
 
+### Batocera / Cemu options
+
+No manual change in Batocera's Wii U emulator options is required when using the installer. It automatically enables the two Cemu/GamePad settings required by this project in `/userdata/system/batocera.conf`:
+
+```text
+wiiu.cemu_touchpad=1
+wiiu.cemu_gamepad=true
+```
+
+These values are written during installation so the GamePad/touchscreen integration is enabled on a fresh Batocera 44 installation as well.
+
 If the Sunshine Web UI credentials are forgotten, stop the Wii U session and reset them with:
 
 ```bash
