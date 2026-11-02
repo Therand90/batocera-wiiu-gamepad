@@ -29,7 +29,7 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE/files/sunshine" "$STAGE/android" "$DIST"
 
 cp -a "$ROOT/install.sh" "$ROOT/uninstall.sh" "$ROOT/VERSION" "$ROOT/LICENSE" "$ROOT/README.md" "$ROOT/RELEASE_NOTES.md" "$STAGE/"
-cp -a "$ROOT/files" "$ROOT/docs" "$STAGE/"
+cp -a "$ROOT/files" "$ROOT/docs" "$STAGE/"\n[ -d "$ROOT/media" ] && cp -a "$ROOT/media" "$STAGE/"
 cp -a "$SUN" "$STAGE/files/sunshine/Sunshine-NoCursor.AppImage"
 chmod +x "$STAGE/files/sunshine/Sunshine-NoCursor.AppImage"
 
