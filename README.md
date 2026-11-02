@@ -4,6 +4,12 @@ Turn an Android phone or tablet into a practical second-screen Wii U GamePad for
 
 > **Status:** v0.2.0. The Batocera runtime and Moonlight WiiU integration are release-ready for Batocera 44 / Wayland / LabWC. The reference setup was validated end-to-end; multi-monitor placement is additionally covered by automated tests.
 
+## Demo
+
+[▶ Watch the 45-second Wii U GamePad demo](media/gamepad-demo.mp4)
+
+The demo was recorded on the validated Batocera 44 setup and shows the real TV + Android GamePad workflow in operation.
+
 ## What it does
 
 The project creates a dedicated `WIIU-GAMEPAD` virtual output, moves Cemu's **GamePad View** to it, streams that output to Android through Sunshine/Moonlight, maps the Android virtual touchscreen back to that output, and keeps TV and GamePad audio separated.
@@ -52,6 +58,8 @@ The physical controls can remain on a local controller connected to Batocera. Th
     release does not ship default credentials. On upgrades, sign in with the existing credentials.
 12. Open **PIN Pairing**, enter Moonlight's PIN, and confirm.
 13. Connect from Moonlight and use the Android device as the Wii U GamePad display/touchscreen.
+
+After the Batocera installation is complete **and the bundled Moonlight WiiU APK has been installed or copied to the Android device**, the extracted release directory can safely be deleted. The installed runtime lives under `/userdata/system/wiiu-gamepad` with its Batocera hook under `/userdata/system/scripts/wiiu-gamepad.sh`.
 
 If the Sunshine Web UI credentials are forgotten, stop the Wii U session and reset them with:
 
@@ -129,6 +137,7 @@ docs/architecture.md   Runtime design
 docs/pairing.md        Sunshine/Moonlight first pairing
 docs/android.md        Android/Moonlight settings
 docs/troubleshooting.md
+media/gamepad-demo.mp4 Real-hardware demo
 ```
 
 ## Installer behavior
