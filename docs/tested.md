@@ -61,9 +61,9 @@ These values are **not hard-coded** in the portable runtime; they are recorded o
 
 ## Android / Moonlight WiiU
 
-The RC client was validated on the reference Android device. The final production-signed APK is built from the same client patch; its build, package identity, and production certificate were verified, and it was accepted for release without a separate final-device regression pass.
+The final production-signed APK was tested on the reference Android device after signing and was validated end-to-end before publication.
 
-Validated/verified behavior includes:
+Validated behavior includes:
 
 - 854x480 / 60 FPS automatic Wii U profile
 - direct touch input
