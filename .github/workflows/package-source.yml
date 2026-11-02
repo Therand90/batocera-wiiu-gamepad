@@ -30,7 +30,7 @@ jobs:
           STAGE="out/batocera-wiiu-gamepad-v$VERSION"
           mkdir -p "$STAGE"
           cp -a install.sh uninstall.sh README.md RELEASE_NOTES.md VERSION LICENSE "$STAGE/"
-          cp -a files docs "$STAGE/"
+          cp -a files docs media "$STAGE/"
           rm -f "$STAGE/files/sunshine/"*.AppImage
 
           if find "$STAGE" -type f \(               -name '*.rpl' -o               -name '*.pem' -o               -name '*.jks' -o               -name '*.keystore' -o               -name '*.p12' -o               -name '*.pfx' -o               -name 'sunshine_state.json' -o               -name 'apps.json'             \) | grep -q .; then
