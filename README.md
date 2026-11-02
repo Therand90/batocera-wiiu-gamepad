@@ -8,7 +8,9 @@ Turn an Android phone or tablet into a practical second-screen Wii U GamePad for
 
 ## Demo
 
-[▶ Watch the 45-second Wii U GamePad demo](media/gamepad-demo.mp4)
+[▶ Watch the 45-second Wii U GamePad demo on YouTube](https://youtu.be/xEgMME6IQfo)
+
+[Download/watch the original MP4](media/gamepad-demo.mp4)
 
 The demo was recorded on the validated Batocera 44 setup and shows the real TV + Android GamePad workflow in operation.
 
