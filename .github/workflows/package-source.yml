@@ -11,6 +11,7 @@ on:
       - .github/workflows/package-source.yml
       - files/**
       - docs/**
+      - media/**
       - install.sh
       - uninstall.sh
       - README.md
