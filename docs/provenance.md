@@ -28,6 +28,11 @@ The private production keystore is **not** stored in the repository. GitHub Acti
 only from encrypted repository secrets. The workflow verifies the APK certificate fingerprint
 before uploading the production artifact.
 
+The resulting production-signed APK was subsequently installed and tested on the reference Android
+device with the Batocera 44 runtime. Video, direct touch, fullscreen behavior, GamePad audio,
+controller workflow, cursor exclusion, pairing, and stream operation were validated before the
+public v0.2.0 release.
+
 ## Moonlight WiiU Android — v0.2.0-rc2
 
 The v0.2.0-rc2 Android client is built from:
