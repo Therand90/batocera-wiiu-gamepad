@@ -1,5 +1,7 @@
 # Batocera Wii U GamePad
 
+[🇫🇷 Documentation française](docs/README.fr.md)
+
 Turn an Android phone or tablet into a practical second-screen Wii U GamePad for **Cemu on Batocera 44**.
 
 > **Status:** v0.2.0. The Batocera runtime and Moonlight WiiU integration are release-ready for Batocera 44 / Wayland / LabWC. The reference setup was validated end-to-end; multi-monitor placement is additionally covered by automated tests.
