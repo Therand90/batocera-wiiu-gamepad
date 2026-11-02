@@ -56,8 +56,8 @@ The private key is never stored in this repository; GitHub Actions receives it t
 repository secrets and verifies the resulting certificate fingerprint before uploading artifacts.
 
 The production-signed APK is built from the same validated Wii U client patch used for RC testing.
-The production build/signature were validated separately; the final production-signed APK was
-accepted for release without an additional physical-device regression pass.
+The final production-signed APK was then tested on the reference Android device and validated
+end-to-end before publication.
 
 ## Sunshine / first pairing
 
