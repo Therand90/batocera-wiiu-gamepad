@@ -8,7 +8,9 @@ Transformez un téléphone ou une tablette Android en véritable second écran *
 
 ## Démonstration
 
-[▶ Voir la démo Wii U GamePad de 45 secondes](../media/gamepad-demo.mp4)
+[▶ Voir la démo Wii U GamePad de 45 secondes sur YouTube](https://youtu.be/xEgMME6IQfo)
+
+[Voir/télécharger le MP4 original](../media/gamepad-demo.mp4)
 
 La vidéo a été enregistrée sur la configuration Batocera 44 validée et montre le fonctionnement réel avec l’écran TV et le GamePad Android.
 
